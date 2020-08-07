@@ -6,10 +6,16 @@ const _ = require('underscore');
 
 const Usuario = require('../models/usuario');
 
+const {
+    verificaToken,
+    verificaAdmin_Role
+} = require('../middlewares/autenticacion');
+
 const app = express();
 
 //----------------------------->
-app.get('/usuarios', function (req, res) {
+app.get('/usuarios', verificaToken, (req, res) => {
+
 
     //obtiene parametros desde la query
     let desde = req.query.desde || 0;
@@ -54,7 +60,7 @@ app.get('/usuarios', function (req, res) {
 
 
 //----------------------------->
-app.post('/usuarios', function (req, res) {
+app.post('/usuarios', [verificaToken, verificaAdmin_Role], (req, res) => {
 
     let body = req.body;
     let usuario = new Usuario({
@@ -86,7 +92,7 @@ app.post('/usuarios', function (req, res) {
 
 
 //----------------------------->
-app.put('/usuarios/:id', function (req, res) {
+app.put('/usuarios/:id', [verificaToken, verificaAdmin_Role], (req, res) => {
 
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
@@ -152,7 +158,7 @@ app.put('/usuarios/:id', function (req, res) {
 // })
 
 //----------------------------->
-app.delete('/usuarios/:id', function (req, res) {
+app.delete('/usuarios/:id', [verificaToken, verificaAdmin_Role], (req, res) => {
 
     let id = req.params.id;
     let cambiaEstado = {
